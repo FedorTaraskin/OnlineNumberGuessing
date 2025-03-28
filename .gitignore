@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+*.elf
+
+# CLion files
+.idea
+
+# Visual Studio files
+.vs
+
+build
+obj

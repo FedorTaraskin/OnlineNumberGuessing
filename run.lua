@@ -6,7 +6,7 @@ if os_target == "windows" then
     print("Open the generated project in Visual Studio to build and run.")
 elseif os_target == "linux" or os_target == "macosx" then
     print("Generating Makefile...")
-    os.execute("premake5 gmake2")
+    os.execute("premake5 gmake")
     print("Building the project...")
     os.execute("make")
     print("Running the server...")
