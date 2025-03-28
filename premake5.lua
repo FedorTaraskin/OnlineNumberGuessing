@@ -32,7 +32,7 @@ function sharedThings()
 	 --[[filter { "files:**.cpp", "files:**.hpp" }
         removeflags {"ExcludeFromBuild"}]]
      filter {}  -- Reset filter
-	 	fpu "value"
+	 	fpu "Hardware"
 end
 
 workspace "OnlineNumberGuessing"
