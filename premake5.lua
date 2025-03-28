@@ -8,7 +8,7 @@ project "Server"
     cppdialect "C++20"
     targetdir "bin/%{cfg.buildcfg}"
     files { "src/server.cpp" }
-    includedirs { "asio" }
+    --includedirs { "asio" }
 
 project "Client"
     kind "ConsoleApp"
@@ -16,4 +16,4 @@ project "Client"
     cppdialect "C++20"
     targetdir "bin/%{cfg.buildcfg}"
     files { "src/client.cpp" }
-    includedirs { "asio" }
+    --includedirs { "asio" }
