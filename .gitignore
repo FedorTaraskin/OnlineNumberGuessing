@@ -31,12 +31,15 @@
 *.out
 *.app
 *.elf
+bin
 
 # CLion files
 .idea
 
 # Visual Studio files
 .vs
-
 build
 obj
+
+# Visual Studio Code
+.vscode

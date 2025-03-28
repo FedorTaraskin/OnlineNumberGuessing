@@ -2,14 +2,13 @@ function sharedThings()
 	kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
+	cdialect "C17"
     --targetdir "bin/%{cfg.buildcfg}" --Old version, doesn't  separate Server from Client
 	targetdir "%{wks.location}/bin/%{prj.name}/%{cfg.buildcfg}"
     files { "src/shared/**.hpp",
             "src/shared/**.cpp" }
 
-    --links { "asio" } --Perhaps needed?
-	    
-	includedirs { "asio" }
+	includedirs { "external/asio/asio/include/**", "external/asio/asio/include"}
 
 	filter "configurations:Debug"
 		defines { "_DEBUG" }
@@ -18,8 +17,13 @@ function sharedThings()
 		
 	filter "configurations:Release"
 		defines { "_RELEASE"}
-		symbols "Off" --Debugging symbols
+		symbols "Off"
 		optimize "Speed"
+		floatingpoint "Fast"
+
+	filter "system:windows"
+		links { "ws2_32", "mswsock" }  -- Required Windows sockets libraries
+		defines { "_WIN32_WINNT=0x0601" }  -- Windows 7 or newer
 		
 	 --[[Following lines are a stupid workaround,
 	 for some reasion when making vs2022 files
@@ -28,6 +32,7 @@ function sharedThings()
 	 --[[filter { "files:**.cpp", "files:**.hpp" }
         removeflags {"ExcludeFromBuild"}]]
      filter {}  -- Reset filter
+	 	fpu "value"
 end
 
 workspace "OnlineNumberGuessing"
