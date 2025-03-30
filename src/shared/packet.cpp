@@ -10,4 +10,4 @@ Packet::Packet(const char* msg) {
 
 header_t Packet::header() {
     if (!totalSize) return totalSize = data.size() + sizeof(header_t);
-} //Not yet implemented - TODO
+}
