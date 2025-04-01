@@ -9,9 +9,11 @@ function sharedThings()
     --Source files
 	targetdir "%{wks.location}/bin/%{cfg.system}/%{cfg.buildcfg}"
     files { "%{wks.location}/src/shared/*", "%{wks.location}/src/shared/**" }
-	includedirs { "%{wks.location}/external/asio/asio/include/**", 
-			      "%{wks.location}/external/asio/asio/include",
-			      "%{wks.location}/src/**" }
+	includedirs {	
+		"%{wks.location}/external/asio/asio/include",
+	  	"%{wks.location}/external/cereal/include/cereal", "%{wks.location}/external/cereal/include",
+      	"%{wks.location}/src/**" 	
+    }
 
 	--Miscellaneous
 	fpu "Hardware"
@@ -30,7 +32,7 @@ function sharedThings()
 		linktimeoptimization "On"
 		floatingpoint "Fast"
 		sanitize { 
-					--"Address", 
+					--"Address", --Removed due to Visual Studio not compiling
 					"Fuzzer", 
 					"Thread", 
 					"UndefinedBehavior" 
