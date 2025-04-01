@@ -60,7 +60,7 @@ end
 workspace "OnlineNumberGuessing"
     configurations { "Debug", "Release" }
     platforms { "Win64", "Win32", "otherPlatorms" }
-    location "."
+    location ".."
 
 --More specifically: the server _frontend_
 project "Server"

@@ -40,6 +40,8 @@ bin
 .vs
 build
 obj
+*.vcxpro*
+*.sln
 
 # Visual Studio Code
 .vscode
