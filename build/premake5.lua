@@ -8,10 +8,10 @@ function sharedThings()
 
     --Source files
 	targetdir "%{wks.location}/bin/%{cfg.system}/%{cfg.buildcfg}"
-    files { "src/shared/*", "src/shared/**" }
-	includedirs { "external/asio/asio/include/**", 
-			      "external/asio/asio/include",
-			      "src/**" }
+    files { "%{wks.location}/src/shared/*", "%{wks.location}/src/shared/**" }
+	includedirs { "%{wks.location}/external/asio/asio/include/**", 
+			      "%{wks.location}/external/asio/asio/include",
+			      "%{wks.location}/src/**" }
 
 	--Miscellaneous
 	fpu "Hardware"
@@ -65,12 +65,13 @@ workspace "OnlineNumberGuessing"
 --More specifically: the server _frontend_
 project "Server"
 	sharedThings()
-    files { "src/server/**.hpp", 
-			"src/server/**.cpp" }
+    files { "%{wks.location}/src/server/**.hpp", 
+		 "%{wks.location}/src/server/**.cpp" }
 
 --Again, _frontend_
 --(though the client doesn't really have a "backend")
 project "Client"
 	sharedThings()
-    files { "src/client/**.hpp",
-			"src/client/**.cpp" }
+    files { "%{wks.location}/src/client/**.hpp",
+		 "%{wks.location}/src/client/**.cpp" }
+
