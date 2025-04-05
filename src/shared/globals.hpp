@@ -1,5 +1,4 @@
 #pragma once
-#include "packet.hpp"
 #include <cstdint> //For size-specific integers
 
 const inline uint16_t port = 9999u;
@@ -9,3 +8,5 @@ const inline uint16_t port = 9999u;
 typedef uint16_t header_t;
 //16 bytes gives us message for sending packets with a
 //size of 2^16, which is 65'536 bytes, or ~65kb.
+
+typedef uint8_t byte;

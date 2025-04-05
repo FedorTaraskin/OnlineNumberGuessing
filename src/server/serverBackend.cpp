@@ -1,21 +1,14 @@
 #include "serverBackend.hpp"
-//Temporary for debugging
-#include <iostream>
-#include <exception>
 
 bool Client::isConnected() { return connected; };
 asio::ip::address_v4 Client::getIp() { return ip; };
 
 void readClient(asio::ip::tcp::socket& mySocket) {
-    std::string receivedData;
+    std::basic_string<byte> receivedData;
     receivedData.reserve(sizeof(header_t));
-    asio::read(mySocket, asio::buffer(receivedData.data(), receivedData.size()));
-    //header_t msgSize = *reinterpret_cast<header_t*>(receivedData.data());
-
-    //WARNING: VERY DANGEROUS AND EXPERIMENTAL
-    receivedData.reserve(*reinterpret_cast<header_t*>(receivedData.data()));
-    std::cout << "Msg size: " << receivedData.size() << '\n';
-    asio::read(mySocket, asio::buffer(receivedData.data(), receivedData.size()));
+    asio::read(mySocket, asio::buffer(receivedData.data(), sizeof(header_t)));
+    std::clog << "Got header! ";
+    header_t size =
 }
 
 void acceptClients(){
@@ -33,14 +26,25 @@ void acceptClients(){
 
             std::clog << "Client connected from: " << mySocket.remote_endpoint().address().to_string() << '\n';
 
-
+            readClient(mySocket);
         }
         catch (std::exception e) {
-            //bind: ?¨õñºõü?ù ðô¨õ¸ ôû  ¸òþõóþ úþýªõú¸ªð ýõòõ¨õý.
-            std::cerr << e.what();
+            std::cerr << "ERROR: " << e.what() << '\n';
         }
         catch (...) {
             std::cerr << "Weird error";
         }
     }
+}
+
+inline int rng(int min, int max) {
+    #ifdef HUGE_NUMBER_GEN
+    //The MOST overkill RNG possible for this!
+    //Almost 5kb big, and the implementation is... something, jeez
+    static std::mt19937 rng(std::random_device{}());
+    #else
+    static std::minstd_rand rng(std::random_device{}());
+    #endif
+    std::uniform_int_distribution<int> dist(min, max);
+    return dist(rng);
 }

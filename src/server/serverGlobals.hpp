@@ -8,3 +8,7 @@
 
 inline unsigned int headerSize = 4;
 //We utilize exclusively ipv4 in this project.
+
+//To be initialized by frontend
+inline unsigned int maxTries; 
+inline signed int min, max; //Range of possible number
