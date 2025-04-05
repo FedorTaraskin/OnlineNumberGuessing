@@ -2,13 +2,13 @@ function sharedThings()
 	kind "ConsoleApp"
 	
 	--Language
-    language "C++"
-    cppdialect "C++20"
+    	language "C++"
+    	cppdialect "C++20"
 	cdialect "C17"
 
     --Source files
-	targetdir "%{wks.location}/bin/%{cfg.system}/%{cfg.buildcfg}"
-    files { "src/shared/*", "src/shared/**" }
+	targetdir "%{wks.location}/build/bin/%{cfg.system}/%{cfg.buildcfg}"
+    	files { "src/shared/*", "src/shared/**" }
 	includedirs { "external/asio/asio/include/**", 
 			      "external/asio/asio/include",
 			      "src/**" }
@@ -22,7 +22,7 @@ function sharedThings()
 		symbols "On"
 		optimize "Off"
 		linktimeoptimization "Off"
-		
+
 	filter "configurations:Release"
 		defines { "_RELEASE"}
 		symbols "Off"
