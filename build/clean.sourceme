@@ -1,0 +1,6 @@
+rm -rf bin *.sln
+rm -rf *vcxproj
+rm -rf *vcxproj*
+rm -rf .vs
+rm -rf Makefile
+rm -rf **.make
