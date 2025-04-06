@@ -4,11 +4,11 @@ bool Client::isConnected() { return connected; };
 asio::ip::address_v4 Client::getIp() { return ip; };
 
 void readClient(asio::ip::tcp::socket& mySocket) {
-    std::basic_string<byte> receivedData;
+    std::string receivedData;
     receivedData.reserve(sizeof(header_t));
     asio::read(mySocket, asio::buffer(receivedData.data(), sizeof(header_t)));
     std::clog << "Got header! ";
-    header_t size =
+    header_t size = deserialize(receivedData)
 }
 
 void acceptClients(){

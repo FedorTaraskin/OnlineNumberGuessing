@@ -10,6 +10,7 @@
 #include "asio.hpp"
 #include <thread>
 #include "globals.hpp"
+#include "serializer.hpp"
 #include <random>
 #include <iostream> //For showing errors easily. Wrong, but simple & quick.
 #include <exception>
