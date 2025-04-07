@@ -1,3 +1,6 @@
 [submodule "external/asio"]
 	path = external/asio
 	url = https://github.com/chriskohlhoff/asio
+[submodule "external/cereal"]
+	path = external/cereal
+	url = https://github.com/USCiLab/cereal
