@@ -5,10 +5,14 @@ asio::ip::address_v4 Client::getIp() { return ip; };
 
 void readClient(asio::ip::tcp::socket& mySocket) {
     std::string receivedData;
-    receivedData.reserve(sizeof(header_t));
-    asio::read(mySocket, asio::buffer(receivedData.data(), sizeof(header_t)));
+    receivedData.resize(headerRawSize);
+    asio::read(mySocket, asio::buffer(receivedData.data(), headerRawSize));
     std::clog << "Got header! ";
-    header_t size = deserialize(receivedData)
+    header_t size = deserialize<header_t>(receivedData);
+    std::clog << "It shows a value of " << size << ".\n";
+    receivedData.resize(size);
+    asio::read(mySocket, asio::buffer(receivedData.data(), size));
+    std::cout << "Received data: " << receivedData << '.\n';
 }
 
 void acceptClients(){

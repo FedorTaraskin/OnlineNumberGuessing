@@ -1,23 +1,19 @@
 #pragma once
-
-#include "globals.hpp"
-#include "packet.hpp"
-#include "sizes.h"
-#include <cstdint>
-#include <istream>
-#include <string_view>
-#include <cereal/archives/portable_binary.hpp>
-#ifdef _MSC_VER
-#include <malloc.h>
-#endif
-
 //Sort of a wrapper around cereal, but specifically for this project.
 
-std::string serialize(const Packet& data);
-Packet deserialize(const std::string& buffer);
+#include <string>
 
-//Meant for primitive types, like header_t
+//Returns the serialized data in the form of an STL string.
+//WARNING: The string is not actual text, but binary data
 template <typename T>
-std::string serialize(const T& data);
+inline std::string serialize(const T& data);
 template <typename T>
-T deserialize(const std::string& buffer);
+inline T deserialize(const std::string& buffer);
+
+//This is kind of fucked up, but...
+//Templates don't really allow me to do this correctly.
+//Sooo, yikes!
+//(If attempted the correct way, linker errors arise.)
+
+//The actual code
+#include "serializer.cpp"

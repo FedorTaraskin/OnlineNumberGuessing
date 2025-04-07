@@ -7,7 +7,7 @@ function sharedThings()
 	cdialect "C17"
 
 --Source files
-	targetdir "%{wks.location}/bin/%{cfg.system}/%{cfg.buildcfg}"
+	targetdir "%{wks.location}/build/bin/%{cfg.system}/%{cfg.buildcfg}"
 	files { "%{wks.location}/src/shared/*", "%{wks.location}/src/shared/**" }
 	includedirs { "%{wks.location}/external/cereal/include",
 				  "%{wks.location}/external/asio/asio/include",
@@ -38,12 +38,12 @@ function sharedThings()
 		floatingpoint "Fast"
 		intrinsics "on"
 		inlining "Auto"
-		sanitize {  --Compiler checks for everything
+		--[[sanitize {  --Compiler checks for everything
 					--"Address", --Commented out due to Visual Studio not compiling
 					"Fuzzer",
 					"Thread",
 					"UndefinedBehavior"
-						 }
+						 }]]--
 
 	filter "system:windows"
 		links { "ws2_32", "mswsock" }  -- Required Windows sockets libraries

@@ -8,26 +8,30 @@
 #include <cereal/archives/portable_binary.hpp>
 #include "serializer.hpp"
 
+#include <stdint.h> //For UINT16_MAX
+
 asio::io_context context;
 asio::ip::address_v4 serverAddress = asio::ip::make_address_v4("127.0.0.1");
 asio::ip::tcp::socket mySocket(context);
 
 char msg[] = "Hello from client!";
-Packet firstPacket(msg);
-std::string serializedPacket = serialize(firstPacket);
-header_t serializedPacketHeader = serializedPacket.size();
+std::string serializedPacket = serialize(msg);
+std::string serializedPacketHeader = serialize(static_cast<header_t>(serializedPacket.size()));
 
 int main() {
     //std::cout << "Bienvenido! Elija un servidor de los siguientes o escriba \"auto\" para automaticamente eligir el primer servidor disponible:\n";
+    //std::clog << "Binary size of header is: " << serializedPacketHeader.size() << "\nAnd its raw representation is: " << serializedPacketHeader << '\n';
     try {
-        mySocket.connect({ serverAddress, port });
+        mySocket.connect(asio::ip::tcp::endpoint( serverAddress, port ));
         std::clog << "Connected to server.\n";
         //Send size
-        asio::write(mySocket, asio::buffer(&serializedPacketHeader, sizeof(header_t)));
+        
+        asio::write(mySocket, asio::buffer(serializedPacketHeader, serializedPacketHeader.size()));
         //Send packet
-        asio::write(mySocket, asio::buffer(serializedPacket.data(), serializedPacketHeader));
+        asio::write(mySocket, asio::buffer(serializedPacket, serializedPacket.size()));
     }
     catch (asio::system_error& e) {
         std::cerr << e.what() << '\n';
     }
+    system("pause");
 }
