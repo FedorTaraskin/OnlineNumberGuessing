@@ -4,8 +4,9 @@
 #include "sizes.h"
 #include <cstdint>
 #include <istream>
-#include <string_view>
 #include <cereal/archives/portable_binary.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/array.hpp>
 //Returns the serialized data in the form of an STL string.
 //WARNING: The string is not actual text, but binary data
 template <typename T>

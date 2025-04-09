@@ -12,7 +12,8 @@ void readClient(asio::ip::tcp::socket& mySocket) {
     std::clog << "It shows a value of " << size << ".\n";
     receivedData.resize(size);
     asio::read(mySocket, asio::buffer(receivedData.data(), size));
-    std::cout << "Received data: " << receivedData << '.\n';
+    receivedData = deserialize<std::string>(receivedData);
+    std::clog << "Received: " << receivedData << '\n';
 }
 
 void acceptClients(){

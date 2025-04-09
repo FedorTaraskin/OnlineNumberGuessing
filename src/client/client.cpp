@@ -5,7 +5,6 @@
 #include <cstring>
 #include <iostream>
 #include <string>
-#include <cereal/archives/portable_binary.hpp>
 #include "serializer.hpp"
 
 #include <stdint.h> //For UINT16_MAX
@@ -14,7 +13,7 @@ asio::io_context context;
 asio::ip::address_v4 serverAddress = asio::ip::make_address_v4("127.0.0.1");
 asio::ip::tcp::socket mySocket(context);
 
-char msg[] = "Hello from client!";
+std::string msg = "Hello from client!";
 std::string serializedPacket = serialize(msg);
 std::string serializedPacketHeader = serialize(static_cast<header_t>(serializedPacket.size()));
 
@@ -25,7 +24,7 @@ int main() {
         mySocket.connect(asio::ip::tcp::endpoint( serverAddress, port ));
         std::clog << "Connected to server.\n";
         //Send size
-        
+        std::clog << "Sending size: " << serializedPacket.size() << '\n';
         asio::write(mySocket, asio::buffer(serializedPacketHeader, serializedPacketHeader.size()));
         //Send packet
         asio::write(mySocket, asio::buffer(serializedPacket, serializedPacket.size()));
