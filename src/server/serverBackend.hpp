@@ -9,6 +9,7 @@
 #include <vector>
 #include "asio.hpp"
 #include <thread>
+#include <chrono>
 #include "globals.hpp"
 #include "serializer.hpp"
 #include <random>
@@ -17,8 +18,6 @@
 
 //For the sake of simplicity and getting this program done before the end of the year,
 //we use syncronous i/o with threads. Fine for a few clients, horrible for many.
-
-inline asio::io_context context;
 
 class Client {
 private:
@@ -29,9 +28,17 @@ public:
 	asio::ip::address_v4 getIp();
 };
 
+void readClient(asio::ip::tcp::socket& mySocket);
+void acceptClients();
+
 using Lobby = std::vector<Client>;
 inline std::vector<Lobby> lobbies;
 
-void acceptClients();
-
 inline int rng(int min, int max);
+
+namespace announce {
+	inline const unsigned int delaySec = 1;
+	void start(); //Repeated announcements
+	void stop();
+	void announceSelf(); //Single announcement
+}

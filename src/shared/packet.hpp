@@ -1,5 +1,4 @@
 #pragma once
-#include "globals.hpp"
 #include <string_view>
 #include <string>
 

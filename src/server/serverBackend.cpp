@@ -53,3 +53,55 @@ inline int rng(int min, int max) {
     std::uniform_int_distribution<int> dist(min, max);
     return dist(rng);
 }
+
+// Namespace for the announcement functionality.
+// "Announcement" = broadcasting a signal on the entire LAN, 
+// for clients to receive and connect.
+namespace announce {
+    bool running = false;
+    std::thread* thrPtr;
+
+    //Blocking
+    void announceWithDelay(unsigned int sec) {
+        while (running) {
+            announceSelf();
+            std::this_thread::sleep_for(std::chrono::seconds(sec));
+        }
+    }
+
+    //Non-blocking
+    void start() {
+        running = true;
+        thrPtr = new std::thread(announceWithDelay, delaySec);
+    }
+
+    //Non-blocking
+    void stop() {
+        running = false;
+        thrPtr->join();
+        delete thrPtr;
+    }
+
+    //Blocking but quick, a single announcement
+    void announceSelf() {
+        using namespace asio::ip;
+        //Create broadcast endpoint
+        udp::endpoint broadcastEndpoint(address_v4::broadcast(), port);
+
+        //Create socket.
+        udp::socket socket(context);
+
+        //Open socket in udp-v4 mode
+        socket.open(udp::v4());
+
+        //Enable broadcast option in socket
+        socket.set_option(asio::socket_base::broadcast(true));
+
+        //We do not need to bind to send broadcasts, only to receive
+        //socket.bind(broadcastEndpoint);
+
+        //Send broadcast msg
+        const std::string serializedServerTag = serialize(serverTag);
+        socket.send_to(asio::buffer(serializedServerTag), broadcastEndpoint);
+    }
+}

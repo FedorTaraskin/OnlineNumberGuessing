@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint> //For size-specific integers
+#include <string>
 
-const inline uint16_t port = 9999;
+const inline uint16_t port = 9876;
 
 //Header size. The header is an unsigned integer
 //which says how many bytes are going to be transmitted.
@@ -17,3 +18,7 @@ typedef uint8_t byte;
 enum actions : uint8_t {
 	createLobby, closeLobby, joinLobby, startGame, guessNum
 };
+
+#include "serializer.hpp"
+const inline std::string serverTag = "ONGserT";
+const inline std::string serializedServerTag = serialize<std::string>(serverTag);

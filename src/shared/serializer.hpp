@@ -5,10 +5,11 @@
 
 //Returns the serialized data in the form of an STL string.
 //WARNING: The string is not actual text, but binary data
+
 template <typename T>
 inline std::string serialize(const T& data);
 template <typename T>
-inline T deserialize(const std::string& buffer);
+inline T deserialize(const std::string_view buffer);
 
 //This is kind of fucked up, but...
 //Templates don't really allow me to do this correctly.

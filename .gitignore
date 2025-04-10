@@ -45,3 +45,6 @@ obj
 
 # Visual Studio Code
 .vscode
+/Client.make
+/Makefile
+/Server.make

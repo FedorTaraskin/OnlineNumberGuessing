@@ -12,3 +12,6 @@ inline unsigned int headerSize = 4;
 //To be initialized by frontend
 inline unsigned int maxTries; 
 inline signed int min, max; //Range of possible number
+
+#include <asio.hpp>
+inline asio::io_context context;
