@@ -48,3 +48,6 @@ obj
 /Client.make
 /Makefile
 /Server.make
+
+# Gmake files
+*.make
