@@ -1,17 +1,18 @@
 #pragma once
-#include <string_view>
-#include <string>
+#include <asio.hpp>
+#include "globals.hpp"
 
-class Packet {
-public:
-    Packet(const char* msg);
-    //I am not quite sure about this, a view might be a bad idea.
-    //However, copying data an extra time when constructing a packet is slow.
-    Packet(std::string_view msg);
-    Packet() {};
-    std::string data;
+template <class Parameter>
+struct Packet {
+    action_t action;
+    Parameter parameter;
+
+    header_t size();
+    void send(asio::ip::tcp::socket& socket);
+    Packet(action_t actionToSet, Parameter& parameterToSet) 
+        : action(actionToSet), parameter(parameterToSet) {}
 
     //Cereal support
     template <class Archive>
-    void serialize(Archive& archive) { archive(data); }
+    void serialize(Archive& archive) { archive(action, parameter); }
 };

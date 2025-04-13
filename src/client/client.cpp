@@ -1,36 +1,35 @@
-//"Main" file for the client
-#include <asio.hpp>
-#include "globals.hpp" //Not to be confused with 'global.hpp', which is ASIO-internal.
-#include <iostream>
-#include <string>
-#include "serializer.hpp"
-#include "clientGlobals.hpp"
+// "Main" file for the client
 #include "clientBackend.hpp"
-
-//Temporals
-#include <cstdlib> //For system()
-#include <cassert>
+#include "globals.hpp" //Not to be confused with 'global.hpp', which is ASIO-internal.
+#include "serializer.hpp"
+#include <asio.hpp>
+#include <iostream>
+#include "packet.hpp"
+#include <string>
 
 std::string serializedPacket = serialize(std::string("Hello from client!"));
 std::string serializedPacketHeader = serialize(static_cast<header_t>(serializedPacket.size()));
+std::string name;
 
 int main() {
-    //std::cout << "Bienvenido! Elija un servidor de los siguientes o escriba \"auto\" para automaticamente eligir el primer servidor disponible:\n";
-    #ifdef _DEBUG
-    std::clog << "Binary size of header is: " << serializedPacketHeader.size() << "\nAnd its raw representation is: " << serializedPacketHeader << '\n';
-    assert(serializedPacketHeader.size() == headerRawSize && "Header size is not correct");
-    #endif
+    std::cout << "Bienvenido! Escriba su nombre: ";
+    std::getline(std::cin, name);
     try {
         std::clog << "Finding server...\n";
         asio::ip::address_v4 serverAddress = getServerIp();
         std::clog << "Found server at " << serverAddress.to_string() << '\n';
-        mySocket.connect(asio::ip::tcp::endpoint( serverAddress, port ));
+        mainSocket.connect(asio::ip::tcp::endpoint( serverAddress, port ));
         std::clog << "Connected to server.\n";
-        //Send size
-        std::clog << "Sending size: " << serializedPacket.size() << '\n';
-        asio::write(mySocket, asio::buffer(serializedPacketHeader, serializedPacketHeader.size()));
-        //Send packet
-        asio::write(mySocket, asio::buffer(serializedPacket, serializedPacket.size()));
+
+        // Send client name
+        Packet<std::string> name(actions::sendName, name);
+        name.send(mainSocket);
+
+        // Ask whether a client with the same name exists.
+        // If true, force user to rechoose a name.
+        
+        // Receive lobbies
+        
     }
     catch (asio::system_error& e) {
         std::cerr << e.what() << '\n';

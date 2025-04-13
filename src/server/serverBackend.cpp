@@ -1,19 +1,22 @@
 #include "serverBackend.hpp"
 
-bool Client::isConnected() { return connected; };
-asio::ip::address_v4 Client::getIp() { return ip; };
+template <typename Data>
+Data readClient(asio::ip::tcp::socket& mySocket) {
+    std::string buffer;
+    // Resize to fit the header in binary form
+    buffer.resize(headerRawSize);
 
-void readClient(asio::ip::tcp::socket& mySocket) {
-    std::string receivedData;
-    receivedData.resize(headerRawSize);
-    asio::read(mySocket, asio::buffer(receivedData.data(), headerRawSize));
-    std::clog << "Got header! ";
-    header_t size = deserialize<header_t>(receivedData);
-    std::clog << "It shows a value of " << size << ".\n";
-    receivedData.resize(size);
-    asio::read(mySocket, asio::buffer(receivedData.data(), size));
-    receivedData = deserialize<std::string>(receivedData);
-    std::clog << "Received: " << receivedData << '\n';
+    // Read the header and deserialize it
+    asio::read(mySocket, asio::buffer(buffer.data(), headerRawSize));
+    header_t size = deserialize<header_t>(buffer);
+
+    // The header tells us how much data is about to be sent.
+    // Resize to fit all the data to be received.
+    buffer.resize(size);
+
+    // Read data and deserialize it
+    asio::read(mySocket, asio::buffer(buffer.data(), size));
+    return deserialize<Data>(buffer);
 }
 
 void acceptClients(){
@@ -26,18 +29,19 @@ void acceptClients(){
         try {
             asio::ip::tcp::socket mySocket(context);
 
-            //This is the actuall waiting and connecting to a client
+            //This is the actual waiting and connecting to a client
             acceptor.accept(mySocket);
 
-            std::clog << "Client connected from: " << mySocket.remote_endpoint().address().to_string() << '\n';
+            std::clog << "Client connected from: "
+                << mySocket.remote_endpoint().address().to_string() << '\n';
 
-            readClient(mySocket);
+            std::string clientName = readClient<std::string>(mySocket);
+
+            idleClients.emplace_back(mySocket.remote_endpoint().address().to_v4(), clientName);
+
         }
-        catch (std::exception e) {
+        catch (std::runtime_error e) {
             std::cerr << "ERROR: " << e.what() << '\n';
-        }
-        catch (...) {
-            std::cerr << "Weird error";
         }
     }
 }
@@ -58,12 +62,13 @@ inline int rng(int min, int max) {
 // "Announcement" = broadcasting a signal on the entire LAN, 
 // for clients to receive and connect.
 namespace announce {
-    bool running = false;
-    std::thread* thrPtr;
+    std::stop_token st;
+    std::jthread* thrPtr;
 
-    //Blocking
-    void announceWithDelay(unsigned int sec) {
-        while (running) {
+    // Blocking, to be run on a separate thread.
+    // Not meant to be used outside of this file.
+    static void announceWithDelay(unsigned int sec) {
+        while (!st.stop_requested()) {
             announceSelf();
             std::this_thread::sleep_for(std::chrono::seconds(sec));
         }
@@ -71,19 +76,27 @@ namespace announce {
 
     //Non-blocking
     void start() {
-        running = true;
-        thrPtr = new std::thread(announceWithDelay, delaySec);
+        if (thrPtr == nullptr) {
+            thrPtr = new std::jthread(announceWithDelay, delaySec);
+            st = thrPtr->get_stop_token();
+        }
     }
 
     //Non-blocking
     void stop() {
-        running = false;
-        thrPtr->join();
-        delete thrPtr;
+        if (!st.stop_requested()) {
+            thrPtr->request_stop();
+            thrPtr->join();
+            delete thrPtr;
+        }
     }
 
     //Blocking but quick, a single announcement
     void announceSelf() {
+        #ifdef _DEBUG
+        std::clog << "Server announcing...\n";
+        #endif // _DEBUG
+
         using namespace asio::ip;
         //Create broadcast endpoint
         udp::endpoint broadcastEndpoint(address_v4::broadcast(), port);

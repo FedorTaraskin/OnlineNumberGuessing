@@ -2,23 +2,31 @@
 
 asio::ip::address_v4 getServerIp() {
 	using namespace asio::ip;
+
+	// Why do we make a local context instead of using the global one?
+	// Well, I forgot. Might deprecate it later - TODO
 	asio::io_context localContext;
+
+	// Make an endpoint representing the server, in UDP-ipv4 mode.
+	// Udp because tcp has no broadcast, ipv4 for whole project simplicity.
 	udp::endpoint serverEndpoint(udp::v4(), port);
 
-	//Make socket
-	udp::socket socket(localContext, udp::endpoint(udp::v4(), port));
-
-	#ifdef _DEBUG
-	(socket.is_open()) ? std::clog << "Open\n" : std::clog << "Closed\n";
-	#endif
+	// Make open socket for server endpoint.
+	udp::socket socket(localContext, serverEndpoint);
 
 	std::string buffer;
-	//Instead of asio::read(), when a socket is UDP you must socket.receive().
-	socket.receive(asio::buffer(buffer)); //TODO
-	if (deserialize<std::string>(buffer) != serverTag) {
-		std::clog << deserialize<std::string>(buffer) << '\n';
-		throw std::runtime_error("Trash found, expected server tag.");
-	}
-	
+	// Resize to fit the binary message
+	buffer.resize(serializedServerTag.size()); 
+
+	do {
+		// Instead of asio::read(), when a socket is UDP you must socket.receive().
+		socket.receive_from(asio::buffer(buffer), serverEndpoint);
+	// Check that we received the server tag and not something else
+	} while (buffer != serializedServerTag);
+
 	return serverEndpoint.address().to_v4();
+};
+
+inline std::vector<Lobby> getLobbies() {
+	// Send the action 
 }
