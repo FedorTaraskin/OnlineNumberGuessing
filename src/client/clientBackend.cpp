@@ -21,12 +21,16 @@ asio::ip::address_v4 getServerIp() {
 	do {
 		// Instead of asio::read(), when a socket is UDP you must socket.receive().
 		socket.receive_from(asio::buffer(buffer), serverEndpoint);
-	// Check that we received the server tag and not something else
+	// Check that wie received the server tag and not something else
 	} while (buffer != serializedServerTag);
 
 	return serverEndpoint.address().to_v4();
 };
 
-inline std::vector<Lobby> getLobbies() {
-	// Send the action 
+// TODO
+inline std::vector<cLobby> getLobbies() {
+	// Send the action
+	comm::send(Packet<bool>{actions::getLobbies, NULL}); // TODO
+
+	return comm::read<std::vector<cLobby>>();
 }

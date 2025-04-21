@@ -6,18 +6,23 @@ function sharedThings()
 	cppdialect "C++20"
 	cdialect "C17"
 
---Source files
+	--Source files
 	targetdir "%{wks.location}/build/bin/%{cfg.system}/%{cfg.buildcfg}"
 	files { "%{wks.location}/src/shared/*", "%{wks.location}/src/shared/**" }
 	includedirs { "%{wks.location}/external/cereal/include",
 				  "%{wks.location}/external/asio/asio/include",
 				  "%{wks.location}/src/**" }
 
+	filter { "files:**.inl" } -- .inl files are not meant to be compiled separately
+		flags { "ExcludeFromBuild" }
+	filter {}
+	
 	--Miscellaneous
 	fpu "Hardware"
 	defines {	"ASIO_STANDALONE",
 				--"HUGE_NUMBER_GEN" --Uncomment for a more sophisticated rng algorithm.
 	}
+	warnings "Extra"
 
 	--Debug and Release differences
 	filter "configurations:Debug"
@@ -27,6 +32,12 @@ function sharedThings()
 		linktimeoptimization "Off"
 		intrinsics "off"
 		inlining "Disabled"
+		--[[sanitize {  --Compiler checks for everything
+							"Address", --Commented out due to Visual Studio not compiling
+							"Fuzzer",
+							"Thread",
+							"UndefinedBehavior"
+								 }]]--
 	filter { "configurations:Debug", "action:vs2017 or 2019 or 2022" }
 		symbols "Full"
 
@@ -38,12 +49,6 @@ function sharedThings()
 		floatingpoint "Fast"
 		intrinsics "on"
 		inlining "Auto"
-		--[[sanitize {  --Compiler checks for everything
-					--"Address", --Commented out due to Visual Studio not compiling
-					"Fuzzer",
-					"Thread",
-					"UndefinedBehavior"
-						 }]]--
 
 	filter "system:windows"
 		links { "ws2_32", "mswsock" }  -- Required Windows sockets libraries
@@ -66,19 +71,14 @@ function sharedThings()
 end
 
 workspace "OnlineNumberGuessing"
-configurations { "Debug", "Release" }
-platforms { "Default" }
-location ".."
+	configurations { "Debug", "Release" }
+	platforms { "Default" }
+	location ".."
 
---More specifically: the server _frontend_
-project "Server"
-	sharedThings()
-files { "%{wks.location}/src/server/**.hpp",
-		"%{wks.location}/src/server/**.cpp" }
+	project "Server"
+		files { "%{wks.location}/src/server/**" }
+		sharedThings()
 
---Again, _frontend_
---(though the client doesn't really have a "backend")
-project "Client"
-	sharedThings()
-files {	"%{wks.location}/src/client/**.hpp",
-		"%{wks.location}/src/client/**.cpp" }
+	project "Client"
+		files {	"%{wks.location}/src/client/**" }
+		sharedThings()

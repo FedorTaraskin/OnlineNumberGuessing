@@ -1,4 +1,4 @@
-//"Main" server file
+// "Main" server file
 #include "globals.hpp"
 #include "serverBackend.hpp"
 #include <iostream>
