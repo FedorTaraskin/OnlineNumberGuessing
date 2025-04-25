@@ -1,4 +1,4 @@
-#include "clientBackend.hpp"
+﻿#include "clientBackend.hpp"
 
 asio::ip::address_v4 getServerIp() {
 	using namespace asio::ip;
@@ -27,10 +27,23 @@ asio::ip::address_v4 getServerIp() {
 	return serverEndpoint.address().to_v4();
 };
 
-// TODO
-inline std::vector<cLobby> getLobbies() {
-	// Send the action
-	comm::send(Packet<bool>{actions::getLobbies, NULL}); // TODO
+void forceAvailableName(std::string& name, asio::ip::tcp::socket& s) {
+	// Send client name
+	comm::send(Packet{ actions::sendName, name }, s);
 
-	return comm::read<std::vector<cLobby>>();
+	// Check whether a client with the same name exists.
+	// If true, force user to rechoose a name.
+	while (!comm::read<bool>(mainSocket).parameter) {
+		std::cout << "Ese nombre ya está ocupado. Elija otro: ";
+		std::cin >> name;
+		comm::send(Packet{ actions::sendName, name }, s);
+	}
+}
+
+// TODO
+inline Packet<std::vector<cLobby>> getLobbies(asio::ip::tcp::socket& s) {
+	// Send the action
+	comm::send(Packet<bool>{actions::getLobbies, NULL}, s); // TODO
+
+	return comm::read<std::vector<cLobby>>(s);
 }

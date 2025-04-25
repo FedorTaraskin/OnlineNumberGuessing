@@ -10,5 +10,5 @@ sClient::~sClient() {
 // To be run in parallel by each client's thread; listens to
 // their packets and responds accordingly.
 inline void sClient::serve() {
-	comm::read<(sSock)
+	//comm::read<(sSock)
 }

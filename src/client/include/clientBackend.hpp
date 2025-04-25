@@ -13,11 +13,9 @@
 // Blocks thread until server is discovered.
 asio::ip::address_v4 getServerIp();
 
-// This "Lobby" struct is different from a server's Lobby struct.
-// The server additionally stores IPs, threads and sockets for each client.
-struct cLobby {
-	std::string name;
-	std::vector<std::string> clients;
-};
+// Forces the client to choose an available name.
+void forceAvailableName(std::string& name, asio::ip::tcp::socket& s);
 
 inline std::vector<cLobby> getLobbies();
+
+inline asio::ip::tcp::socket mainSocket{ comm::context, asio::ip::tcp::v4() };

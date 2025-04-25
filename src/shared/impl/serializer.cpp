@@ -5,13 +5,13 @@
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/types/string.hpp>
 //#include <cereal/types/array.hpp>
+#include <cereal/types/vector.hpp>
 #include <cereal/types/common.hpp>
 
 // Returns the serialized data in the form of an STL string.
 // WARNING: The string is not actual text, but binary data
 template <typename T>
-inline constexpr std::string g_Serialize(const T& data) {
-	//std::stringstream ss(std::ios::binary | std::ios::in | std::ios::out);
+inline std::string g_Serialize(const T& data) {
 	std::ostringstream ss(std::ios::binary);
 	{
 		cereal::PortableBinaryOutputArchive archive(ss);
@@ -21,7 +21,7 @@ inline constexpr std::string g_Serialize(const T& data) {
 }
 
 template <typename T>
-inline constexpr T g_Deserialize(const std::string_view buffer) {
+inline T g_Deserialize(const std::string_view buffer) {
 	std::stringstream ss(std::ios::binary);
 	ss.write(buffer.data(), buffer.size());
 	T data;

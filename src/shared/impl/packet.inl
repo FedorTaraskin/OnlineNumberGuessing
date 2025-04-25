@@ -2,9 +2,9 @@
 // This file is only meant to be included by packet.hpp
 // Do not use it, use packet.hpp
 
+#include "ONGconcepts.hpp"
 #include <asio.hpp>
 #include "serializer.hpp"
-#include "ONGconcepts.hpp"
 
 // Overload for types that have .size() (like std::string)
 template <validParameter Parameter>

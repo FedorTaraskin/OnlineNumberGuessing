@@ -19,14 +19,14 @@ inline std::vector<sLobby> lobbies;
 // Clients that have connected to the server, but are in no lobby.
 inline std::list<sClient> idleClients;
 
-inline void sanAndStoreClient() {
+inline void sanAndStoreClient(asio::ip::tcp::socket& s) {
     bool validName;
     std::string clientName;
 
     do {
-        clientName = comm::read<std::string>().parameter;
+        clientName = comm::read<std::string>(s).parameter;
         validName = isValidName(clientName);
-        comm::send(Packet<bool>{static_cast<action_t>(actions::approveName), validName});
+        comm::send(Packet<bool>{static_cast<action_t>(actions::approveName), validName}, s);
     } while (!validName);
 }
 
