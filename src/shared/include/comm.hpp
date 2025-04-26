@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <string>
 #include <type_traits>
+#include <variant>
+#include <vector>
 
 // For the sake of simplicity and getting this program done before the end of the year,
 // we use syncronous i/o with threads. Fine for a few clients, horrible for many.

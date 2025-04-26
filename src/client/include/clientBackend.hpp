@@ -1,10 +1,11 @@
 #pragma once
 
-#include <asio.hpp>
-#include <vector>
+#include "comm.hpp"
 #include "globals.hpp"
 #include "serializer.hpp"
-#include "comm.hpp"
+#include <asio.hpp>
+#include <string>
+#include <vector>
 
 // Temp
 #include <iostream>

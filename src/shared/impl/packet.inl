@@ -9,13 +9,18 @@
 // Overload for types that have .size() (like std::string)
 template <validParameter Parameter>
 inline header_t Packet<Parameter>::size() const requires hasSizeMFunc<Parameter> {
-    return sizeof(action) + parameter.size();
+    return parameter.size();
 }
 
 // Overload for types that do NOT have .size() (like int32_t, bool)
 template <validParameter Parameter>
 inline header_t Packet<Parameter>::size() const requires (!hasSizeMFunc<Parameter>) {
-    return sizeof(action) + sizeof(parameter);
+    return sizeof(parameter);
+}
+
+// Overload for packets w/o a paremeter.
+inline header_t Packet<void>::size() const {
+    return 0;
 }
 
 template <validParameter Parameter>

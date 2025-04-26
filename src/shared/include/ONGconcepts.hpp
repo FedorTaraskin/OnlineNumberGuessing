@@ -25,4 +25,6 @@ concept validParameter =
 	std::same_as <Parameter, bool> ||
 	std::same_as <Parameter, std::string> ||
 	std::same_as <Parameter, int32_t> ||
-	std::same_as <Parameter, std::vector<cLobby>>;
+	std::same_as <Parameter, std::vector<cLobby>> ||
+	std::same_as <Parameter, void>
+	;

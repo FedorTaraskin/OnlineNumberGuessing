@@ -12,13 +12,10 @@ typedef uint16_t header_t;
 // size of 2^16, which is 65'536 bytes, or ~65kb.
 
 namespace actions {
-    // Request/answer		  Request	Answer		 Request	 Request	  Request	  Request	 Request	Request
+    // Request/answer		  Request	Answer		 Both   	 Request	  Request	  Request	 Request	Request
     enum actions : action_t { sendName, approveName, getLobbies, createLobby, closeLobby, joinLobby, startGame, guessNum };
-    // Parameters:			  name		unused				     lobbyName,				  lobbyName,			num
+    // Parameters:			  name		unused		 *readbelow  lobbyName,				  lobbyName,			num
     // Parameter types:		  string    bool         *readbelow  string                   string                int32_t
-    // 
-    // Note: Where no parameter is, the type will be a bool. Void is not accepted by the compiler :(
-    // Note 2: Currently reworking packet system to eliminate unnecessary sends of bools
     // 
     // *getLobbies: When sent from client to server, has no parameter type. When sent from server to client,
     // the parameter type is vector<cLobby>.
@@ -29,6 +26,8 @@ struct Packet {
     action_t action;
     Parameter parameter;
 
+    // Returns the size of the parameter. 
+    // Action size is not included!
     inline header_t size() const;
 
     // Overloads of size(): don't look into it, just use the one above
@@ -40,6 +39,20 @@ struct Packet {
     //Cereal support
     template <class Archive>
     void serialize(Archive& archive) { archive(action, parameter); }
+};
+
+// Specialized overload of Packet struct for no parameter.
+template <>
+struct Packet<void> {
+    action_t action;
+
+    inline header_t size() const;
+
+    inline void send(asio::ip::tcp::socket& socket) const;
+
+    //Cereal support
+    template <class Archive>
+    void serialize(Archive& archive) { archive(action); }
 };
 
 #include "packet.inl"
