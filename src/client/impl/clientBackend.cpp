@@ -4,7 +4,7 @@ asio::ip::address_v4 getServerIp() {
 	using namespace asio::ip;
 
 	// Why do we make a local context instead of using the global one?
-	// Well, I forgot. Might deprecate it later - TODO
+	// Well, I forgot. Might deprecate it later - to do
 	asio::io_context localContext;
 
 	// Make an endpoint representing the server, in UDP-ipv4 mode.
@@ -33,17 +33,18 @@ void forceAvailableName(std::string& name, asio::ip::tcp::socket& s) {
 
 	// Check whether a client with the same name exists.
 	// If true, force user to rechoose a name.
-	while (!comm::read<bool>(mainSocket).parameter) {
+	// The huge logic condition is basically reading a packet as bool.
+	// To do (less important): handle exceptions if std::get throws here.
+	while (!std::get<bool>(comm::read(mainSocket).parameter)) {
 		std::cout << "Ese nombre ya está ocupado. Elija otro: ";
 		std::cin >> name;
 		comm::send(Packet{ actions::sendName, name }, s);
 	}
 }
 
-// TODO
-inline Packet<std::vector<cLobby>> getLobbies(asio::ip::tcp::socket& s) {
+std::vector<cLobby> getLobbies(asio::ip::tcp::socket& s) {
 	// Send the action
-	comm::send(Packet<bool>{actions::getLobbies, NULL}, s); // TODO
-
-	return comm::read<std::vector<cLobby>>(s);
+	comm::send(Packet{ actions::getLobbies, std::monostate{} }, s);
+	// Error likely, good for now
+	return comm::readParameter<std::vector<cLobby>>(s);
 }

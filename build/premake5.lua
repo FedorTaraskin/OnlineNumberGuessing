@@ -77,12 +77,15 @@ workspace "OnlineNumberGuessing"
 
 	project "Server"
 		files { "%{wks.location}/src/server/**" }
+		defines { "_SERVER" }
 		sharedThings()
 
 	project "Client"
 		files {	"%{wks.location}/src/client/**" }
+		defines { "_CLIENT" }
 		sharedThings()
 
 	project "Test"
 		files { "%{wks.location}/src/test/**" }
+		defines { "_TEST" }
 		sharedThings()

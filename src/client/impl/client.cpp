@@ -23,6 +23,7 @@ int main() {
         forceAvailableName(name, mainSocket);
         
         // Receive lobbies
+        std::vector<cLobby> lobbies = getLobbies(mainSocket);
         
     }
     catch (asio::system_error& e) {

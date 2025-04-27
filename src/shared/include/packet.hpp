@@ -1,15 +1,9 @@
 #pragma once
-#include "ONGconcepts.hpp"
-#include <asio/ip/tcp.hpp>
-#include <cstdint> // For size-specific integers
-
-typedef uint8_t action_t;
-
-// Header size. The header is an unsigned integer
-// which says how many bytes are going to be transmitted.
-typedef uint16_t header_t;
-// 16 bytes gives us message for sending packets with a
-// size of 2^16, which is 65'536 bytes, or ~65kb.
+#include "globals.hpp"
+#include <asio.hpp>
+#include <string>
+#include <variant>
+#include <vector>
 
 namespace actions {
     // Request/answer		  Request	Answer		 Both   	 Request	  Request	  Request	 Request	Request
@@ -21,38 +15,15 @@ namespace actions {
     // the parameter type is vector<cLobby>.
 }
 
-template <validParameter Parameter>
+typedef std::variant<std::monostate, std::string, bool, int32_t, std::vector<cLobby>> Parameter_t;
+
 struct Packet {
     action_t action;
-    Parameter parameter;
+    Parameter_t parameter;
 
-    // Returns the size of the parameter. 
-    // Action size is not included!
-    inline header_t size() const;
-
-    // Overloads of size(): don't look into it, just use the one above
-    inline header_t size() const requires hasSizeMFunc<Parameter>;
-    inline header_t size() const requires (!hasSizeMFunc<Parameter>);
-
-    inline void send(asio::ip::tcp::socket& socket) const;
+    inline void send(asio::ip::tcp::socket& socket) const noexcept;
 
     //Cereal support
     template <class Archive>
     void serialize(Archive& archive) { archive(action, parameter); }
 };
-
-// Specialized overload of Packet struct for no parameter.
-template <>
-struct Packet<void> {
-    action_t action;
-
-    inline header_t size() const;
-
-    inline void send(asio::ip::tcp::socket& socket) const;
-
-    //Cereal support
-    template <class Archive>
-    void serialize(Archive& archive) { archive(action); }
-};
-
-#include "packet.inl"

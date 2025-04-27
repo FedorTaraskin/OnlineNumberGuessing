@@ -3,6 +3,7 @@
 #include <string>
 #include <string_view>
 #include <cereal/archives/portable_binary.hpp>
+#include <cereal/types/variant.hpp>
 #include <cereal/types/string.hpp>
 //#include <cereal/types/array.hpp>
 #include <cereal/types/vector.hpp>

@@ -1,33 +1,18 @@
 #pragma once
 // This file is only meant to be included by packet.hpp
 // Do not use it, use packet.hpp
-
 #include "ONGconcepts.hpp"
 #include <asio.hpp>
 #include "serializer.hpp"
 
-// Overload for types that have .size() (like std::string)
-template <validParameter Parameter>
-inline header_t Packet<Parameter>::size() const requires hasSizeMFunc<Parameter> {
-    return parameter.size();
-}
-
-// Overload for types that do NOT have .size() (like int32_t, bool)
-template <validParameter Parameter>
-inline header_t Packet<Parameter>::size() const requires (!hasSizeMFunc<Parameter>) {
-    return sizeof(parameter);
-}
-
-// Overload for packets w/o a paremeter.
-inline header_t Packet<void>::size() const {
-    return 0;
-}
-
-template <validParameter Parameter>
-inline void Packet<Parameter>::send(asio::ip::tcp::socket& socket) const {
+inline void Packet::send(asio::ip::tcp::socket& socket) const noexcept {
     // Send the serialized size of the packet
-    asio::write(socket, asio::buffer(g_Serialize(this->size())));
+    asio::write(socket, asio::buffer(g_Serialize(serializedSize())));
 
     // Send the actual packet
     asio::write(socket, asio::buffer(g_Serialize(*this)));
+}
+
+inline header_t serializedSize() {
+    if (!m_serializedSize) m_serializedSize = g_Serialize()
 }

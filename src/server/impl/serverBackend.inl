@@ -24,9 +24,9 @@ inline void sanAndStoreClient(asio::ip::tcp::socket& s) {
     std::string clientName;
 
     do {
-        clientName = comm::read<std::string>(s).parameter;
+        clientName = std::get<std::string>(comm::read<std::string>(s).parameter);
         validName = isValidName(clientName);
-        comm::send(Packet<bool>{static_cast<action_t>(actions::approveName), validName}, s);
+        comm::send(Packet{static_cast<action_t>(actions::approveName), validName}, s);
     } while (!validName);
 }
 

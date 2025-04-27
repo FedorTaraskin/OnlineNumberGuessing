@@ -1,11 +1,26 @@
 // Internal details, do not matter outside of this file.
-namespace internal {
-    using returnType = std::variant<bool, std::string, int32_t, std::vector<cLobby>>;
-    static returnType getParamType(action_t act) {
-        using namespace actions;
+namespace impl {
+    enum type : uint_fast8_t { 
+        MONOSTATE, STRING, BOOL, INT, VECTORCLOBBY 
+    };
+
+    static uint_fast8_t getParamType(action_t act) {
+        //using namespace actions;
+        //using enum actions;
+        using namespace impl;
+        using enum type;
         switch (act) {
-        case sendName:
-            return std::string();
+        case actions::sendName: return STRING;
+        case actions::approveName: return BOOL;
+        case actions::getLobbies: return
+            #ifdef _CLIENT
+                VECTORCLOBBY
+            #elif defined(_SERVER)
+                MONOSTATE
+            #else
+                #error Must define either `_CLIENT` or `_SERVER`.
+            #endif
+            ;
         default:
             break;
         }
@@ -14,24 +29,31 @@ namespace internal {
 
 // What is shown to other code.
 namespace comm {
-    template <validParameter Parameter>
-    inline void send(const Packet<Parameter>& data, asio::ip::tcp::socket& localSock) {
+    inline void send(const Packet& data, asio::ip::tcp::socket& localSock) {
         using namespace asio;
 
         // First we send the action in fixed size
         write(localSock, buffer(g_Serialize(data.action)));
 
+        #ifdef _DEBUG
+        // If this is wrong, comm::read will be trying to read a different amount
+        // of data.
+        assert(g_Serialize(data.action).size() == serializedActionSize);
+        #endif
+
         // Second, we send the parameter size (also fixed) only if the parameter is not void
         // If the parameter is void (that is, no parameter) we skip this to save bandwidth.
-        if (!std::is_same_v<Parameter, void>) write(localSock, buffer(g_Serialize(data.size())));
+        using dt = std::decay_t<decltype(data)>;
+        if constexpr (!std::is_same_v<dt, std::monostate>) 
+            // Serialize the packet's size in serialized form and send.
+            write(localSock, buffer(g_Serialize(static_cast<header_t>(g_Serialize(data).size()))));
 
         // Now, because the other side can deduce the parameter type based on
         // the action, we send the parameter itself.
         write(localSock, buffer(g_Serialize(data.parameter)));
     }
 
-    template<validParameter Parameter>
-    inline Packet<Parameter> read(asio::ip::tcp::socket& s) {
+    inline Packet read(asio::ip::tcp::socket& s) {
         std::string buffer; // Not to be confused with any asio::buffer
 
         // Resize to fit a serialized(action_t)
@@ -41,15 +63,40 @@ namespace comm {
         asio::read(s, asio::buffer(buffer));
         action_t act = g_Deserialize<action_t>(buffer);
 
-        // Depending on the action, we know the parameter (and its type).
+        // Read the parameter size
+        buffer.resize(serializedHeaderSize);
+        asio::read(s, asio::buffer(buffer));
+        header_t size = g_Deserialize<header_t>(buffer);
 
-
-        // The header tells us how much data is about to be sent.
+        // The parameter size tells us how much data is about to be sent.
         // Resize to fit all the data to be received.
-        //buffer.resize(size); // TODO
+        buffer.resize(size);
+        
+        // Deserialize the buffer into the actual parameter
+        Parameter_t p = g_Deserialize<Parameter_t>(buffer);
 
-        // Read data and deserialize it
-        //asio::read(mainSocket, asio::buffer(buffer.data(), size)); // TODO
-        return g_Deserialize<Packet<Parameter>>(buffer);
+        #ifdef _DEBUG
+        // Inside of the lambda passed to std::visit, p becomes
+        // of its original raw parameter type.
+        std::visit(
+            [&](auto&& value) {
+                using T = std::decay_t<decltype(value)>;
+                if constexpr (std::is_same_v<T, std::monostate>) {
+                    std::cout << "There is nothing.\n";
+                }
+                else { std::cout << "There is something\n"; }
+            },
+        p);
+        #endif
+
+        // Make the packet and return it
+        return Packet{ act, p };
+    }
+
+    template <typename T>
+    // Function for reading the parameter of a packet directly if you
+    // know the parameter's type before calling.
+    inline T readParameter(asio::ip::tcp::socket& s) {
+        return std::get<T>(read(s).parameter);
     }
 }

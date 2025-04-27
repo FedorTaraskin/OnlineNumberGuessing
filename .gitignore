@@ -51,3 +51,4 @@ obj
 
 # Gmake files
 *.make
+/src/shared/globals.hpp.save

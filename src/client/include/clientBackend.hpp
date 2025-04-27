@@ -17,6 +17,6 @@ asio::ip::address_v4 getServerIp();
 // Forces the client to choose an available name.
 void forceAvailableName(std::string& name, asio::ip::tcp::socket& s);
 
-inline std::vector<cLobby> getLobbies();
+std::vector<cLobby> getLobbies(asio::ip::tcp::socket& s);
 
 inline asio::ip::tcp::socket mainSocket{ comm::context, asio::ip::tcp::v4() };

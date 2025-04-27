@@ -17,7 +17,7 @@
 const inline uint16_t port = 9876;
 
 // How big header_t becomes after serialization.
-const inline unsigned int headerRawSize = 3;
+const inline unsigned int serializedHeaderSize = 3;
 
 // Tag to identify servers. Used for automatic server discovery from clients on LAN
 const inline std::string serverTag = "ONGserT";
@@ -31,11 +31,11 @@ namespace comm {
 
     // Send function
     template <validParameter Parameter>
-    inline void send(const Packet<Parameter> &data, asio::ip::tcp::socket& localSock);
+    inline void send(const Packet &data, asio::ip::tcp::socket& localSock);
 
     // Read function
     template <validParameter Parameter>
-    inline Packet<Parameter> read(asio::ip::tcp::socket& localSock);
+    inline Packet read(asio::ip::tcp::socket& localSock);
 }
 
 // Include definitions at the end of the header
